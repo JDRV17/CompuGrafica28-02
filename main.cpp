@@ -25,10 +25,8 @@ protected:
    clock_t time0,time1;
    float timer010;  // timer counting 0->1->0
    bool bUp;        // flag if counting up or down.
-   GLMmodel* objmodel_ptr;
-   GLMmodel* obj_ptra;
-   GLMmodel* mountains;
-   GLMmodel* objmodel_ptr1; //*** Para Textura: variable para objeto texturizado
+   GLMmodel* objmodel_ptr[4];
+    //*** Para Textura: variable para objeto texturizado
    GLuint texid; //*** Para Textura: variable que almacena el identificador de textura
 
 
@@ -83,20 +81,21 @@ public:
 		  glPushMatrix();
 			  glTranslatef(-1.5f, 0.0f, -2.0f);
 			  glPushMatrix();
+				glTranslatef(0, -0.5f, 2);
 				glScalef(0.5, 0.5, 0.5);
 				glRotatef(90, 0, 1, 0);
-				glmDraw(objmodel_ptr, GLM_SMOOTH | GLM_MATERIAL);
+				dibujaMalla(0);
 			  glPopMatrix();
 			  glPushMatrix(); 
 				glTranslatef(2.0f, 0.5f, 2.0f);
 				glScalef(2, 2, 2);
-				glmDraw(obj_ptra, GLM_SMOOTH | GLM_MATERIAL);
+				dibujaMalla(2);
 			  glPopMatrix();
 			  glPushMatrix();
 				  glTranslatef(1.5f, 1.0f, -3.0f);
 				  glScalef(5, 5, 5);
 				  glRotatef(90, 0, 1, 0);
-				  glmDraw(mountains, GLM_SMOOTH | GLM_MATERIAL);
+				  dibujaMalla(1);
 			  glPopMatrix();
 		  glPopMatrix();
 	      //glutSolidTeapot(1.0);
@@ -110,7 +109,7 @@ public:
 		  glRotatef(30, 0, 1, 0);
 		  glScalef(0.5, 0.5, 0.5);
 		  glBindTexture(GL_TEXTURE_2D, texid);
-		  glmDraw(objmodel_ptr1, GLM_SMOOTH | GLM_MATERIAL | GLM_TEXTURE);
+		  dibujaMalla(3);
 		  glPopMatrix();
 	  //glutSolidTeapot(1.0);
 	  if (shader1) shader1->end();
@@ -124,6 +123,19 @@ public:
 		Repaint();
 	}
 
+
+	void dibujaMalla(int pos)
+	{
+		if (pos != 3)
+		{
+			glmDraw(objmodel_ptr[pos], GLM_SMOOTH | GLM_MATERIAL);
+		}
+		else
+		{
+			glmDraw(objmodel_ptr[pos], GLM_SMOOTH | GLM_MATERIAL | GLM_TEXTURE);
+		}
+	}
+
 	virtual void OnIdle() {}
 
 	// When OnInit is called, a render context (in this case GLUT-Window) 
@@ -134,15 +146,15 @@ public:
 		glShadeModel(GL_SMOOTH);
 		glEnable(GL_DEPTH_TEST);
 
-		shader = SM.loadfromFile("vertexshader.txt","fragmentshader.txt"); // load (and compile, link) from file
-		if (shader==0) 
-         std::cout << "Error Loading, compiling or linking shader\n";
-      else
-      {
-         ProgramObject = shader->GetProgramObject();
-      }
+		shader = SM.loadfromFile("vertexshader.txt", "fragmentshader.txt"); // load (and compile, link) from file
+		if (shader == 0)
+			std::cout << "Error Loading, compiling or linking shader\n";
+		else
+		{
+			ProgramObject = shader->GetProgramObject();
+		}
 
-	 //*** Para Textura: abre los shaders para texturas
+		//*** Para Textura: abre los shaders para texturas
 		shader1 = SM.loadfromFile("vertexshaderT.txt", "fragmentshaderT.txt"); // load (and compile, link) from file
 		if (shader1 == 0)
 			std::cout << "Error Loading, compiling or linking shader\n";
@@ -151,69 +163,30 @@ public:
 			ProgramObject = shader1->GetProgramObject();
 		}
 
-      time0 = clock();
-      timer010 = 0.0f;
-      bUp = true;
+		time0 = clock();
+		timer010 = 0.0f;
+		bUp = true;
+		
+		abreMallas(0, "./Mallas/chamanlegacy.obj");
+		abreMallas(1, "./Mallas/untitled.obj");
+		abreMallas(2, "./Mallas/church.obj");
+		abreMallas(3, "./Mallas/tronco.obj");
+		initialize_textures();
+	}
+	 //Abrir mallas
+	
+	void abreMallas(int pos, char* nombre){
+		objmodel_ptr[pos] = NULL;
 
-	  //Abrir mallas
-	  objmodel_ptr = NULL;
-
-	  if (!objmodel_ptr)
-	  {
-		  objmodel_ptr = glmReadOBJ("./Mallas/chamanlegacy.obj");//##########################
-		  if (!objmodel_ptr)
-			  exit(0);
-
-		  glmUnitize(objmodel_ptr);
-		  glmFacetNormals(objmodel_ptr);
-		  glmVertexNormals(objmodel_ptr, 90.0);
-	  }
-
-	  //Abrir mallas
-	  mountains = NULL;
-
-	  if (!mountains)
-	  {
-		  mountains = glmReadOBJ("./Mallas/untitled.obj");//##########################
-		  if (!mountains)
-			  exit(0);
-
-		  glmUnitize(mountains);
-		  glmFacetNormals(mountains);
-		  glmVertexNormals(mountains, 90.0);
-	  }
-
-	  //*** Para Textura: abrir malla de objeto a texturizar
-	  objmodel_ptr1 = NULL;
-
-	  if (!objmodel_ptr1)
-	  {
-		  objmodel_ptr1 = glmReadOBJ("./Mallas/tronco.obj");
-		  if (!objmodel_ptr1)
-			  exit(0);
-
-		  glmUnitize(objmodel_ptr1);
-		  glmFacetNormals(objmodel_ptr1);
-		  glmVertexNormals(objmodel_ptr1, 90.0);
-	  }
- 
-	  obj_ptra = NULL;
-
-	  if (!obj_ptra)
-	  {
-		  obj_ptra = glmReadOBJ("./Mallas/church.obj");//##########################
-		  if (!obj_ptra)
-			  exit(0);
-
-		  glmUnitize(obj_ptra);
-		  glmFacetNormals(obj_ptra);
-		  glmVertexNormals(obj_ptra, 90.0);
-	  }
-
-	  //*** Para Textura: abrir archivo de textura
-	  initialize_textures();
-      DemoLight();
-
+		if (!objmodel_ptr[pos])
+		{
+			objmodel_ptr[pos] = glmReadOBJ(nombre);
+			if (!objmodel_ptr[pos])
+				exit(0);
+			glmUnitize(objmodel_ptr[pos]);
+			glmFacetNormals(objmodel_ptr[pos]);
+			glmVertexNormals(objmodel_ptr[pos], 90.0);
+		}
 	}
 
 
