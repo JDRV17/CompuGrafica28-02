@@ -83,11 +83,13 @@ public:
 		  glPushMatrix();
 			  glTranslatef(-1.5f, 0.0f, -2.0f);
 			  glPushMatrix();
+				glScalef(0.5, 0.5, 0.5);
 				glRotatef(90, 0, 1, 0);
 				glmDraw(objmodel_ptr, GLM_SMOOTH | GLM_MATERIAL);
 			  glPopMatrix();
 			  glPushMatrix(); 
-				glTranslatef(2.0f, 0.0f, 2.0f);
+				glTranslatef(2.0f, 0.5f, 2.0f);
+				glScalef(2, 2, 2);
 				glmDraw(obj_ptra, GLM_SMOOTH | GLM_MATERIAL);
 			  glPopMatrix();
 			  glPushMatrix();
@@ -106,6 +108,7 @@ public:
 		  glPushMatrix();
 		  glTranslatef(1.5f, -0.5f, 0.0f);
 		  glRotatef(30, 0, 1, 0);
+		  glScalef(0.5, 0.5, 0.5);
 		  glBindTexture(GL_TEXTURE_2D, texid);
 		  glmDraw(objmodel_ptr1, GLM_SMOOTH | GLM_MATERIAL | GLM_TEXTURE);
 		  glPopMatrix();
